@@ -1,0 +1,19 @@
+# =============================================================================
+# k8s/cluster-issuer.yaml — Tells cert-manager to use Let's Encrypt for TLS certs
+# What this file does: Creates a ClusterIssuer that cert-manager uses to request
+#                      free TLS certificates from Let's Encrypt automatically.
+# =============================================================================
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: fanik.chtgpt@gmail.com       # Let's Encrypt sends cert expiry warnings here
+    privateKeySecretRef:
+      name: letsencrypt-prod-key         # cert-manager stores the ACME account key here
+    solvers:
+      - http01:
+          ingress:
+            class: nginx                 # use the nginx ingress we just installed

@@ -1,0 +1,32 @@
+# =============================================================================
+# k8s/ingress.yaml — Routes HTTPS traffic to the cmia-api pods via nginx
+# What this file does: Terminates TLS at the nginx ingress, forwards HTTP to
+#                      the cmia-api-svc on port 8000.
+# Host: 128.203.219.104.nip.io — nip.io maps *.X.X.X.X.nip.io → X.X.X.X
+#       so no domain registration needed, TLS still works.
+# =============================================================================
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cmia-ingress
+  namespace: default
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod   # triggers auto cert provisioning
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"   # force HTTP → HTTPS
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - 128.203.219.104.nip.io
+      secretName: cmia-tls                             # cert-manager stores cert here
+  rules:
+    - host: 128.203.219.104.nip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: cmia-api-svc
+                port:
+                  number: 80

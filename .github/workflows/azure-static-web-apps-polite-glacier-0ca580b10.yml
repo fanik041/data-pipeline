@@ -23,7 +23,7 @@ jobs:
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         env:
-          VITE_API_URL: "http://172.169.72.234"   # AKS LoadBalancer public IP — baked in at Vite build time
+          VITE_API_URL: "https://128.203.219.104.nip.io"   # AKS nginx ingress with Let's Encrypt TLS
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_POLITE_GLACIER_0CA580B10 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
