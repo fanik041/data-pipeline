@@ -39,11 +39,13 @@ jobs:
           password: ${{ secrets.ACR_PASSWORD }}
 
       # Tag image with both git SHA (immutable) and latest (for K8s rolling update)
+      # platforms: force linux/amd64 — AKS nodes are AMD64, Mac builds ARM64 which causes exec format error
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
+          platforms: linux/amd64
           tags: |
             ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
             ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:latest

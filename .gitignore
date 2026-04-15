@@ -22,3 +22,10 @@ build/
 
 #modules
 node_modules/
+
+#CLAUDE
+CLAUDE.md
+.playwright-mcp/
+STATUS.md
+TRUTH_SOURCE.md
+docs/
