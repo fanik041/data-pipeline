@@ -5,7 +5,9 @@
 // Tech layer: Frontend data layer — all components import from here, never use fetch directly
 // =============================================================================
 
-const BASE = '/api'
+// In dev: Vite proxies /api → localhost:8000 (see vite.config.js)
+// In production: VITE_API_URL is set in Azure Static Web Apps → Configuration
+const BASE = import.meta.env.VITE_API_URL ?? '/api'
 
 function authHeaders() {
   const token = localStorage.getItem('cmia_token')
