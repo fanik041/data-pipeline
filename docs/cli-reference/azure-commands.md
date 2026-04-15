@@ -118,10 +118,12 @@ sqlcmd \
 ## 5. Azure Container Registry (ACR)
 
 ```bash
+# Create ACR — admin-enabled exposes username/password for GitHub Actions secrets
 az acr create \
   --resource-group cmia-source-db \
   --name cmiaregistry \
-  --sku Basic
+  --sku Basic \
+  --admin-enabled true
 ```
 
 ### Log in to ACR (required before docker push)
@@ -129,13 +131,22 @@ az acr create \
 az acr login --name cmiaregistry
 ```
 
-### Build and push Docker image via ACR (no local Docker needed)
+### Build and push Docker image locally
 ```bash
-az acr build \
-  --registry cmiaregistry \
-  --image fastapi-migration:latest \
-  --file services/fastapi/Dockerfile \
-  .
+docker build -t cmiaregistry.azurecr.io/cmia-api:latest .
+docker push cmiaregistry.azurecr.io/cmia-api:latest
+```
+
+### Tag with git SHA (used by CI/CD for immutable image references)
+```bash
+docker build -t cmiaregistry.azurecr.io/cmia-api:$(git rev-parse --short HEAD) .
+docker push cmiaregistry.azurecr.io/cmia-api:$(git rev-parse --short HEAD)
+```
+
+### List images in ACR
+```bash
+az acr repository list --name cmiaregistry --output table
+az acr repository show-tags --name cmiaregistry --repository cmia-api --output table
 ```
 
 ---
@@ -143,13 +154,13 @@ az acr build \
 ## 6. AKS Cluster
 
 ```bash
+# --attach-acr grants AKS managed identity pull access to ACR — no credentials needed
 az aks create \
   --resource-group cmia-source-db \
   --name cmia-aks \
   --location centralus \
   --node-count 1 \
-  --node-vm-size Standard_D2ps_v6 \
-  --tier free \
+  --node-vm-size Standard_B2s \
   --attach-acr cmiaregistry \
   --generate-ssh-keys
 ```
@@ -159,45 +170,63 @@ az aks create \
 az aks get-credentials \
   --resource-group cmia-source-db \
   --name cmia-aks
+
+kubectl get nodes   # should show 1 node in Ready state
 ```
 
-### Verify nodes are running
+### Encode secrets before applying (each value must be base64)
 ```bash
-kubectl get nodes
+echo -n "cmia-source-server.database.windows.net" | base64
+echo -n "cmia-source-db"                           | base64
+echo -n "your_username"                            | base64
+echo -n "your_password"                            | base64
+# Paste encoded values into k8s/secret.yaml, then:
 ```
 
-### Deploy FastAPI to AKS
+### Deploy to AKS (first time)
 ```bash
-kubectl apply -f k8s/fastapi-deployment.yaml
-kubectl apply -f k8s/fastapi-service.yaml
+kubectl apply -f k8s/secret.yaml
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
 ```
 
 ### Check pod status
 ```bash
 kubectl get pods
-kubectl logs <pod-name>          # view logs
-kubectl describe pod <pod-name>  # debug a failing pod
+kubectl get service cmia-api-svc --watch   # wait for EXTERNAL-IP to appear
+kubectl logs <pod-name>                    # view logs
+kubectl describe pod <pod-name>            # debug a failing pod
+```
+
+### Rolling update (zero-downtime redeploy)
+```bash
+# AKS starts new pods, waits for /health readiness probe, then kills old pods
+kubectl set image deployment/cmia-api \
+  cmia-api=cmiaregistry.azurecr.io/cmia-api:<new-tag>
+kubectl rollout status deployment/cmia-api --timeout=120s
+```
+
+### Rollback to previous version
+```bash
+kubectl rollout undo deployment/cmia-api
 ```
 
 ---
 
-## 7. GitHub Actions — Service Principal
-
-### Create service principal for GitHub Actions to authenticate with Azure
-```bash
-az ad sp create-for-rbac \
-  --name "cmia-github-actions" \
-  --role contributor \
-  --scopes /subscriptions/773cbc80-612b-4a05-955f-823edaa4fe93 \
-  --sdk-auth
-# Copy the full JSON output → paste into GitHub secret AZURE_CREDENTIALS
-```
+## 7. GitHub Actions — CI/CD Secrets
 
 ### Get ACR credentials for GitHub secrets
 ```bash
 az acr credential show --name cmiaregistry
 # ACR_USERNAME = username field
 # ACR_PASSWORD = passwords[0].value field
+# Add both to: GitHub repo → Settings → Secrets and variables → Actions
+```
+
+### Export kubeconfig as base64 for GitHub secret KUBE_CONFIG
+```bash
+cat ~/.kube/config | base64 | pbcopy
+# Paste into GitHub secret: KUBE_CONFIG
 ```
 
 ---
@@ -210,10 +239,10 @@ az staticwebapp create \
   --resource-group cmia-source-db \
   --location centralus \
   --sku Free \
-  --source https://github.com/<your-username>/data-pipeline \
+  --source https://github.com/fanik041/data-pipeline \
   --branch main \
-  --app-location /services/react \
-  --output-location build
+  --app-location app/frontend \
+  --output-location dist
 ```
 
 ---
@@ -227,15 +256,18 @@ az resource list --resource-group cmia-source-db --output table
 # Check AKS cluster status
 az aks show --resource-group cmia-source-db --name cmia-aks --query provisioningState
 
-# Stream AKS pod logs
-kubectl logs -f deployment/fastapi-migration
+# Stream live pod logs
+kubectl logs -f deployment/cmia-api
 
-# Scale AKS node pool up/down
+# Scale AKS node pool
 az aks scale \
   --resource-group cmia-source-db \
   --name cmia-aks \
   --node-count 2
 
-# Get AKS external IP after service deploy
-kubectl get service fastapi-service --watch
+# Get all K8s resources at once
+kubectl get all
+
+# Force restart all pods in deployment
+kubectl rollout restart deployment/cmia-api
 ```

@@ -57,7 +57,11 @@
       "Bash(python -:*)",
       "Bash(find /Users/fahimanik/code/Misc/data-pipeline -name Dockerfile* -o -name *.yaml -o -name *.yml)",
       "Bash(ls /Users/fahimanik/code/Misc/data-pipeline/docs/screenshots/*.png)",
-      "Bash(echo 'no pngs there' find /Users/fahimanik/code/Misc/data-pipeline -name *.png)"
+      "Bash(echo 'no pngs there' find /Users/fahimanik/code/Misc/data-pipeline -name *.png)",
+      "Bash(az acr:*)",
+      "Bash(az aks:*)",
+      "Bash(kubectl get:*)",
+      "Bash(pip freeze:*)"
     ]
   }
 }
