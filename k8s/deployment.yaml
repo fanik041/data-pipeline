@@ -21,6 +21,8 @@ spec:
       labels:
         app: cmia-api
     spec:
+      imagePullSecrets:
+        - name: acr-secret             # ACR credentials — needed if AKS managed identity loses pull access
       containers:
         - name: cmia-api
           image: cmiaregistry.azurecr.io/cmia-api:latest   # updated by CI/CD
