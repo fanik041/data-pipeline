@@ -1,0 +1,225 @@
+/* =============================================================================
+   CMIA Design System — Dark Trading Terminal
+   Fonts: Fira Code (data/numbers), Fira Sans (UI text)
+   Palette: Deep navy bg, electric blue primary, amber signals, green/red bull/bear
+   ============================================================================= */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Backgrounds */
+  --bg-base:     #060B14;
+  --bg-surface:  #0C1526;
+  --bg-elevated: #112040;
+  --bg-hover:    #162B55;
+
+  /* Borders */
+  --border:      #1A2E50;
+  --border-light:#2A4070;
+
+  /* Text */
+  --text-primary:   #E2E8F0;
+  --text-secondary: #94A3B8;
+  --text-muted:     #4A6080;
+
+  /* Brand accent */
+  --blue:       #3B82F6;
+  --blue-dim:   #1D4ED8;
+  --blue-glow:  rgba(59,130,246,.18);
+  --blue-muted: rgba(59,130,246,.08);
+
+  /* Signal colors */
+  --amber:      #F59E0B;
+  --amber-glow: rgba(245,158,11,.15);
+  --green:      #10B981;
+  --green-glow: rgba(16,185,129,.15);
+  --red:        #EF4444;
+  --red-glow:   rgba(239,68,68,.15);
+
+  /* Fonts */
+  --font-mono: 'Fira Code', 'Cascadia Code', monospace;
+  --font-sans: 'Fira Sans', system-ui, sans-serif;
+
+  /* Spacing scale (4pt base) */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px; --sp-8: 32px; --sp-10: 40px;
+
+  /* Radius */
+  --r-sm: 6px; --r-md: 10px; --r-lg: 16px;
+
+  /* Transitions */
+  --tx: 180ms ease;
+}
+
+html, body, #root {
+  height: 100%;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--blue-dim); }
+
+/* Selection */
+::selection { background: var(--blue-glow); color: var(--blue); }
+
+/* Utility classes */
+.mono { font-family: var(--font-mono); }
+.text-sm  { font-size: 12px; }
+.text-base{ font-size: 14px; }
+.text-lg  { font-size: 16px; }
+.text-xl  { font-size: 20px; }
+.text-2xl { font-size: 24px; }
+.text-3xl { font-size: 30px; }
+.text-muted    { color: var(--text-muted); }
+.text-secondary{ color: var(--text-secondary); }
+.text-blue  { color: var(--blue); }
+.text-green { color: var(--green); }
+.text-red   { color: var(--red); }
+.text-amber { color: var(--amber); }
+.fw-500 { font-weight: 500; }
+.fw-600 { font-weight: 600; }
+.fw-700 { font-weight: 700; }
+
+/* Card */
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: var(--sp-6);
+  transition: border-color var(--tx);
+}
+.card:hover { border-color: var(--border-light); }
+
+/* Badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  letter-spacing: .03em;
+}
+.badge-blue   { background: var(--blue-muted);  color: var(--blue);  border: 1px solid var(--blue-glow); }
+.badge-green  { background: var(--green-glow);  color: var(--green); border: 1px solid rgba(16,185,129,.3); }
+.badge-red    { background: var(--red-glow);    color: var(--red);   border: 1px solid rgba(239,68,68,.3); }
+.badge-amber  { background: var(--amber-glow);  color: var(--amber); border: 1px solid rgba(245,158,11,.3); }
+
+/* Button */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--r-sm);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all var(--tx);
+  white-space: nowrap;
+}
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.btn-primary {
+  background: var(--blue);
+  color: #fff;
+}
+.btn-primary:hover:not(:disabled) { background: #60A5FA; box-shadow: 0 0 16px var(--blue-glow); }
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover:not(:disabled) { background: var(--bg-elevated); color: var(--text-primary); border-color: var(--border-light); }
+
+/* Input */
+.input {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  padding: var(--sp-2) var(--sp-3);
+  outline: none;
+  transition: border-color var(--tx), box-shadow var(--tx);
+  width: 100%;
+}
+.input::placeholder { color: var(--text-muted); }
+.input:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px var(--blue-glow);
+}
+
+/* Select */
+.select {
+  appearance: none;
+  background: var(--bg-elevated) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  padding: var(--sp-2) 32px var(--sp-2) var(--sp-3);
+  outline: none;
+  cursor: pointer;
+  transition: border-color var(--tx);
+}
+.select:focus { border-color: var(--blue); }
+
+/* Loading spinner */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner {
+  width: 16px; height: 16px;
+  border: 2px solid var(--border-light);
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+
+/* Fade-in animation */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 280ms ease forwards; }
+
+/* Pulse dot */
+@keyframes pulse-dot {
+  0%,100% { opacity: 1; }
+  50%      { opacity: .3; }
+}
+.pulse-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* Grid scan-line overlay for the trading terminal look */
+.scanlines::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,.03) 2px,
+    rgba(0,0,0,.03) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}

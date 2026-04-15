@@ -8,6 +8,17 @@ from typing import Optional
 from datetime import date
 
 
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+
+class LoginResponse(BaseModel):
+    access_token: str
+    token_type: str
+    username: str
+
+
 class HealthResponse(BaseModel):
     status: str
     db_backend: str

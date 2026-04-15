@@ -18,7 +18,9 @@
 #   curl "http://localhost:8000/prices/AAPL?backend=snowflake"
 # =============================================================================
 
+import base64
 import logging
+import os
 import time
 from datetime import date
 from typing import Literal, Optional
@@ -30,6 +32,8 @@ from dotenv import load_dotenv
 from app import db, queries
 from app.models import (
     HealthResponse,
+    LoginRequest,
+    LoginResponse,
     PredictionSignal,
     PricePoint,
     SectorSymbol,
@@ -65,6 +69,36 @@ app.add_middleware(
 )
 
 Backend = Literal["azure", "snowflake"]
+
+# ---------------------------------------------------------------------------
+# HELPER
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# POST /auth/login
+# ---------------------------------------------------------------------------
+
+@app.post("/auth/login", response_model=LoginResponse, tags=["auth"])
+def login(body: LoginRequest):
+    """
+    Validate credentials against Azure SQL env vars and return a bearer token.
+    Token is base64(username:timestamp) — stateless, sufficient for demo auth.
+    INTERVIEW POINT: credentials reuse the DB auth, so RLS roles apply automatically.
+    """
+    expected_user = os.getenv("AZURE_SQL_USERNAME", "")
+    expected_pass = os.getenv("AZURE_SQL_PASSWORD", "")
+    if body.username != expected_user or body.password != expected_pass:
+        raise HTTPException(
+            status_code=401,
+            detail={
+                "error": "Invalid credentials",
+                "trace": "Username or password does not match Azure SQL credentials in .env",
+            },
+        )
+    token = base64.b64encode(f"{body.username}:{int(time.time())}".encode()).decode()
+    log.info("Login: user '%s' authenticated", body.username)
+    return LoginResponse(access_token=token, token_type="bearer", username=body.username)
+
 
 # ---------------------------------------------------------------------------
 # HELPER

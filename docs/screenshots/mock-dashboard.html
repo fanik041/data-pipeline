@@ -1,0 +1,138 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>CMIA Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Fira Sans',sans-serif;background:#060B14;color:#E2E8F0;display:flex;height:100vh;overflow:hidden}
+/* sidebar */
+aside{width:220px;flex-shrink:0;background:#0C1526;border-right:1px solid #1A2E50;display:flex;flex-direction:column;padding:24px 0}
+.logo-wrap{padding:0 20px 28px;display:flex;align-items:center;gap:10px}
+.logo{width:34px;height:34px;border-radius:8px;background:#3B82F6;display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px rgba(59,130,246,.3);font-size:16px;color:#fff}
+.logo-name{font-weight:700;font-size:15px}
+.logo-sub{font-size:10px;color:#4A6080;letter-spacing:.06em}
+nav{flex:1;padding:0 10px;display:flex;flex-direction:column;gap:2px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;font-size:13.5px;color:#94A3B8;text-decoration:none;transition:all .18s}
+.nav-item.active{background:#3B82F6;color:#fff;font-weight:600;box-shadow:0 0 10px rgba(59,130,246,.25)}
+.nav-icon{font-size:15px}
+.backend{padding:16px 20px;border-top:1px solid #1A2E50}
+.backend-label{font-size:11px;color:#4A6080;margin-bottom:8px;letter-spacing:.06em}
+.toggle{display:flex;background:#112040;border-radius:8px;padding:3px;border:1px solid #1A2E50}
+.toggle-btn{flex:1;padding:5px 0;border-radius:6px;border:none;cursor:pointer;font-size:11px;font-weight:600;font-family:'Fira Code',monospace;letter-spacing:.04em;transition:all .18s}
+.toggle-btn.active{background:#3B82F6;color:#fff;box-shadow:0 0 8px rgba(59,130,246,.3)}
+.toggle-btn:not(.active){background:transparent;color:#4A6080}
+.backend-hint{font-size:11px;color:#4A6080;margin-top:6px;text-align:center}
+.user-row{padding:12px 20px;border-top:1px solid #1A2E50;display:flex;align-items:center;justify-content:space-between}
+.user-name{font-size:13px;font-weight:500}
+.user-role{font-size:11px;color:#4A6080}
+/* main */
+main{flex:1;overflow-y:auto;padding:28px 32px}
+h1{font-size:22px;font-weight:700;margin-bottom:4px}
+.subtitle{font-size:13px;color:#94A3B8;margin-bottom:28px}
+.mono{color:#3B82F6;font-family:'Fira Code',monospace}
+/* kpi grid */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.kpi{background:#0C1526;border:1px solid #1A2E50;border-radius:10px;padding:20px;border-left-width:3px}
+.kpi-label{font-size:11px;font-weight:600;color:#4A6080;letter-spacing:.08em;margin-bottom:12px}
+.kpi-value{font-family:'Fira Code',monospace;font-size:28px;font-weight:700;line-height:1;margin-bottom:6px}
+.kpi-sub{font-size:12px;color:#4A6080}
+.blue{border-left-color:#3B82F6}.blue .kpi-value{color:#3B82F6}
+.amber{border-left-color:#F59E0B}.amber .kpi-value{color:#F59E0B}
+.green{border-left-color:#10B981}.green .kpi-value{color:#10B981}
+.red{border-left-color:#EF4444}.red .kpi-value{color:#EF4444}
+/* mid */
+.mid{display:grid;grid-template-columns:1fr 1.4fr;gap:16px;margin-bottom:24px}
+.card{background:#0C1526;border:1px solid #1A2E50;border-radius:10px;padding:20px}
+.card-title{font-size:14px;font-weight:600;margin-bottom:16px}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;font-family:'Fira Code',monospace}
+.badge-green{background:rgba(16,185,129,.15);color:#10B981;border:1px solid rgba(16,185,129,.3)}
+.badge-red{background:rgba(239,68,68,.15);color:#EF4444;border:1px solid rgba(239,68,68,.3)}
+.signal-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1A2E50}
+.sig-sym{font-family:'Fira Code',monospace;font-weight:600;font-size:13px}
+.sig-date{font-size:11px;color:#4A6080}
+.sig-rsi{font-family:'Fira Code',monospace;color:#10B981;font-weight:600;font-size:13px}
+.sig-macd{font-size:11px;color:#4A6080}
+/* chart placeholder */
+.chart-area{height:200px;position:relative;margin-top:8px}
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:160px;padding-top:10px}
+.bar{flex:1;border-radius:4px 4px 0 0;display:flex;flex-direction:column;justify-content:flex-end}
+.bar-label{font-size:9px;color:#4A6080;text-align:center;margin-top:4px;font-family:'Fira Code',monospace}
+/* table */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:8px 12px;font-size:11px;color:#4A6080;font-weight:600;letter-spacing:.06em;border-bottom:1px solid #1A2E50;white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid #1A2E50}
+td.sym{font-family:'Fira Code',monospace;font-weight:600;color:#3B82F6}
+td.num{font-family:'Fira Code',monospace}
+td.muted{color:#94A3B8;font-size:12px}
+tr:hover td{background:#0C1526}
+</style></head><body>
+<aside>
+  <div class="logo-wrap">
+    <div class="logo">⚡</div>
+    <div><div class="logo-name">CMIA</div><div class="logo-sub">MARKETS INTEL</div></div>
+  </div>
+  <nav>
+    <div class="nav-item active"><span class="nav-icon">▦</span> Dashboard</div>
+    <div class="nav-item"><span class="nav-icon">📈</span> Market Data</div>
+    <div class="nav-item"><span class="nav-icon">🧠</span> Predictor</div>
+    <div class="nav-item"><span class="nav-icon">◉</span> Sectors</div>
+    <div class="nav-item"><span class="nav-icon">⇄</span> DB Compare</div>
+  </nav>
+  <div class="backend">
+    <div class="backend-label">DB BACKEND</div>
+    <div class="toggle"><button class="toggle-btn active">AZ</button><button class="toggle-btn">SF</button></div>
+    <div class="backend-hint">↳ Azure SQL (OLTP)</div>
+  </div>
+  <div class="user-row">
+    <div><div class="user-name">cmia_admin</div><div class="user-role">Administrator</div></div>
+    <span style="color:#4A6080;font-size:16px">⎋</span>
+  </div>
+</aside>
+<main>
+  <h1>Dashboard</h1>
+  <p class="subtitle">Market intelligence overview · <span class="mono">AZURE</span></p>
+  <div class="kpi-grid">
+    <div class="kpi blue"><div class="kpi-label">SYMBOLS TRACKED</div><div class="kpi-value">20</div><div class="kpi-sub">Active equities</div></div>
+    <div class="kpi amber"><div class="kpi-label">SECTORS COVERED</div><div class="kpi-value">4</div><div class="kpi-sub">Market segments</div></div>
+    <div class="kpi green"><div class="kpi-label">BULLISH SIGNALS</div><div class="kpi-value">12</div><div class="kpi-sub">60% of total</div></div>
+    <div class="kpi red"><div class="kpi-label">BEARISH SIGNALS</div><div class="kpi-value">8</div><div class="kpi-sub">40% of total</div></div>
+  </div>
+  <div class="mid">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span class="card-title" style="margin:0">Top Bullish Signals</span><span class="badge badge-green">↑ BUY</span></div>
+      <div class="signal-row"><div><div class="sig-sym">AAPL</div><div class="sig-date">2024-03-15</div></div><div style="text-align:right"><div class="sig-rsi">RSI 62.4</div><div class="sig-macd">MACD 2.14</div></div></div>
+      <div class="signal-row"><div><div class="sig-sym">MSFT</div><div class="sig-date">2024-03-15</div></div><div style="text-align:right"><div class="sig-rsi">RSI 58.7</div><div class="sig-macd">MACD 1.88</div></div></div>
+      <div class="signal-row"><div><div class="sig-sym">NVDA</div><div class="sig-date">2024-03-15</div></div><div style="text-align:right"><div class="sig-rsi">RSI 71.2</div><div class="sig-macd">MACD 5.33</div></div></div>
+      <div class="signal-row"><div><div class="sig-sym">GOOGL</div><div class="sig-date">2024-03-15</div></div><div style="text-align:right"><div class="sig-rsi">RSI 54.1</div><div class="sig-macd">MACD 0.91</div></div></div>
+      <div class="signal-row"><div><div class="sig-sym">META</div><div class="sig-date">2024-03-15</div></div><div style="text-align:right"><div class="sig-rsi">RSI 66.8</div><div class="sig-macd">MACD 3.07</div></div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Symbol Distribution by Sector</div>
+      <div class="bar-chart">
+        <div><div class="bar" style="height:140px;background:#3B82F6"></div><div class="bar-label">Tech</div></div>
+        <div><div class="bar" style="height:90px;background:#10B981"></div><div class="bar-label">Fin</div></div>
+        <div><div class="bar" style="height:70px;background:#F59E0B"></div><div class="bar-label">Health</div></div>
+        <div><div class="bar" style="height:50px;background:#EF4444"></div><div class="bar-label">Energy</div></div>
+        <div><div class="bar" style="height:60px;background:#8B5CF6"></div><div class="bar-label">Cons</div></div>
+        <div><div class="bar" style="height:40px;background:#EC4899"></div><div class="bar-label">Comm</div></div>
+        <div><div class="bar" style="height:30px;background:#14B8A6"></div><div class="bar-label">Ind</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">All Signal Predictions</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Symbol</th><th>Sector</th><th>Date</th><th>RSI-14</th><th>MACD</th><th>BB Pos</th><th>Volatility</th><th>Signal</th></tr></thead>
+        <tbody>
+          <tr><td class="sym">AAPL</td><td class="muted">Technology</td><td class="muted">2024-03-15</td><td class="num">62.4</td><td class="num">2.1400</td><td class="num">0.720</td><td class="num">0.0152</td><td><span class="badge badge-green">↑ BUY</span></td></tr>
+          <tr><td class="sym">MSFT</td><td class="muted">Technology</td><td class="muted">2024-03-15</td><td class="num">58.7</td><td class="num">1.8800</td><td class="num">0.650</td><td class="num">0.0134</td><td><span class="badge badge-green">↑ BUY</span></td></tr>
+          <tr><td class="sym">GOOGL</td><td class="muted">Technology</td><td class="muted">2024-03-15</td><td class="num">54.1</td><td class="num">0.9100</td><td class="num">0.480</td><td class="num">0.0178</td><td><span class="badge badge-green">↑ BUY</span></td></tr>
+          <tr><td class="sym">JPM</td><td class="muted">Financial Services</td><td class="muted">2024-03-15</td><td class="num">41.3</td><td class="num">-0.5200</td><td class="num">0.310</td><td class="num">0.0201</td><td><span class="badge badge-red">↓ SELL</span></td></tr>
+          <tr><td class="sym">NVDA</td><td class="muted">Technology</td><td class="muted">2024-03-15</td><td class="num">71.2</td><td class="num">5.3300</td><td class="num">0.870</td><td class="num">0.0312</td><td><span class="badge badge-green">↑ BUY</span></td></tr>
+          <tr><td class="sym">XOM</td><td class="muted">Energy</td><td class="muted">2024-03-15</td><td class="num">38.9</td><td class="num">-1.2100</td><td class="num">0.220</td><td class="num">0.0189</td><td><span class="badge badge-red">↓ SELL</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+</body></html>

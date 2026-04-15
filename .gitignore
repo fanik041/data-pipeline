@@ -1,5 +1,7 @@
 # Secrets
 .env
+.claude/
+.remember/
 
 # Python
 __pycache__/
