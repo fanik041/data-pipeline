@@ -38,6 +38,10 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
+      # Required for multi-platform builds — without this, 'platforms:' is silently ignored
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       # Tag image with both git SHA (immutable) and latest (for K8s rolling update)
       # platforms: force linux/amd64 — AKS nodes are AMD64, Mac builds ARM64 which causes exec format error
       - name: Build and push Docker image
@@ -65,4 +69,4 @@ jobs:
         run: |
           kubectl set image deployment/cmia-api \
             cmia-api=${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:$IMAGE_TAG
-          kubectl rollout status deployment/cmia-api --timeout=120s
+          kubectl rollout status deployment/cmia-api --timeout=300s
