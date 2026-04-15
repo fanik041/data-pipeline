@@ -55,7 +55,9 @@
       "Bash(grep -n \"benchmark_prices\\\\|symbol_code\" /Users/fahimanik/code/Misc/data-pipeline/db/azure-sql/*.sql)",
       "Bash(source .venv/bin/activate)",
       "Bash(python -:*)",
-      "Bash(find /Users/fahimanik/code/Misc/data-pipeline -name Dockerfile* -o -name *.yaml -o -name *.yml)"
+      "Bash(find /Users/fahimanik/code/Misc/data-pipeline -name Dockerfile* -o -name *.yaml -o -name *.yml)",
+      "Bash(ls /Users/fahimanik/code/Misc/data-pipeline/docs/screenshots/*.png)",
+      "Bash(echo 'no pngs there' find /Users/fahimanik/code/Misc/data-pipeline -name *.png)"
     ]
   }
 }

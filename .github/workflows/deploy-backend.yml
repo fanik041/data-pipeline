@@ -1,0 +1,66 @@
+# =============================================================================
+# .github/workflows/deploy-backend.yml
+# What this file does: On push to main, builds the Docker image, pushes to ACR,
+#                      then rolls out the new image to AKS.
+# Flow: GitHub -> ACR (docker push) -> AKS (kubectl set image)
+# Secrets required in GitHub repo settings:
+#   ACR_USERNAME, ACR_PASSWORD  (from: ACR -> Access keys)
+#   KUBE_CONFIG                 (from: az aks get-credentials -> base64 of ~/.kube/config)
+# =============================================================================
+name: Deploy Backend to AKS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "app/**"
+      - "Dockerfile"
+      - "requirements.txt"
+      - "k8s/**"
+
+env:
+  ACR_LOGIN_SERVER: cmiaregistry.azurecr.io
+  IMAGE_NAME: cmia-api
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Log in to ACR using Access Key credentials stored in GitHub Secrets
+      - name: Log in to Azure Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.ACR_LOGIN_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      # Tag image with both git SHA (immutable) and latest (for K8s rolling update)
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:latest
+
+      # Write kubeconfig from secret so kubectl can talk to AKS
+      - name: Set up kubectl
+        env:
+          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+        run: |
+          mkdir -p $HOME/.kube
+          echo "$KUBE_CONFIG" | base64 -d > $HOME/.kube/config
+
+      # Rolling update: AKS pulls new image, old pods stay up until new ones are ready
+      - name: Deploy to AKS
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          kubectl set image deployment/cmia-api \
+            cmia-api=${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:$IMAGE_TAG
+          kubectl rollout status deployment/cmia-api --timeout=120s

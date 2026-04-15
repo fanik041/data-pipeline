@@ -3,6 +3,7 @@
 .claude/
 .remember/
 
+
 # Python
 __pycache__/
 *.py[cod]
@@ -18,3 +19,6 @@ build/
 # IDE
 .vscode/
 .idea/
+
+#modules
+node_modules/

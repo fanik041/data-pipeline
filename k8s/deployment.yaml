@@ -1,0 +1,50 @@
+# =============================================================================
+# k8s/deployment.yaml — Runs the FastAPI container as a K8s Deployment
+# What this file does: Tells AKS how many replicas to run and where to pull
+#                      the image from (ACR). Secrets are mounted as env vars.
+# Layer: AKS → pulls image from ACR → runs Pods → Service exposes them.
+# =============================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cmia-api
+  namespace: default
+  labels:
+    app: cmia-api
+spec:
+  replicas: 1                   # 1 is fine for a demo; scale up with `kubectl scale`
+  selector:
+    matchLabels:
+      app: cmia-api
+  template:
+    metadata:
+      labels:
+        app: cmia-api
+    spec:
+      containers:
+        - name: cmia-api
+          image: cmiaregistry.azurecr.io/cmia-api:latest   # updated by CI/CD
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - secretRef:
+                name: cmia-secrets   # mounts all keys from secret.yaml as env vars
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          readinessProbe:            # AKS won't send traffic until this passes
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:             # AKS restarts the pod if this fails 3x
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 30

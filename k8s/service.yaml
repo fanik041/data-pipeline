@@ -1,0 +1,19 @@
+# =============================================================================
+# k8s/service.yaml — Exposes the API pods to the internet via Azure Load Balancer
+# What this file does: Creates a public IP that routes port 80 → pod port 8000.
+# Why LoadBalancer and not Ingress: simpler for a single-service demo.
+#   For multiple services, use nginx-ingress with path-based routing instead.
+# =============================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: cmia-api-svc
+  namespace: default
+spec:
+  type: LoadBalancer            # Azure provisions a public IP automatically
+  selector:
+    app: cmia-api               # routes to pods with this label
+  ports:
+    - protocol: TCP
+      port: 80                  # external port (what the browser hits)
+      targetPort: 8000          # internal pod port
