@@ -1,0 +1,21 @@
+symbol,company_name,sector,industry,market_cap,currency,exchange,country,as_of_date
+AAPL,Apple Inc.,Technology,Consumer Electronics,3826310709248,USD,NMS,United States,2026-04-14
+MSFT,Microsoft Corporation,Technology,Software - Infrastructure,2908958490624,USD,NMS,United States,2026-04-14
+GOOGL,Alphabet Inc.,Communication Services,Internet Content & Information,3957957066752,USD,NMS,United States,2026-04-14
+AMZN,"Amazon.com, Inc.",Consumer Cyclical,Internet Retail,2651460730880,USD,NMS,United States,2026-04-14
+META,"Meta Platforms, Inc.",Communication Services,Internet Content & Information,1646108213248,USD,NMS,United States,2026-04-14
+NVDA,NVIDIA Corporation,Technology,Semiconductors,4687219654656,USD,NMS,United States,2026-04-14
+TSLA,"Tesla, Inc.",Consumer Cyclical,Auto Manufacturers,1352057487360,USD,NMS,United States,2026-04-14
+CRM,"Salesforce, Inc.",Technology,Software - Application,162747531264,USD,NYQ,United States,2026-04-14
+ORCL,Oracle Corporation,Technology,Software - Infrastructure,477596188672,USD,NYQ,United States,2026-04-14
+ADBE,Adobe Inc.,Technology,Software - Application,97747255296,USD,NMS,United States,2026-04-14
+JPM,JPMorgan Chase & Co.,Financial Services,Banks - Diversified,842256285696,USD,NYQ,United States,2026-04-14
+GS,"The Goldman Sachs Group, Inc.",Financial Services,Capital Markets,266481156096,USD,NYQ,United States,2026-04-14
+MS,Morgan Stanley,Financial Services,Capital Markets,289975042048,USD,NYQ,United States,2026-04-14
+BLK,"BlackRock, Inc.",Financial Services,Asset Management,166004047872,USD,NYQ,United States,2026-04-14
+BAC,Bank of America Corporation,Financial Services,Banks - Diversified,381332979712,USD,NYQ,United States,2026-04-14
+C,Citigroup Inc.,Financial Services,Banks - Diversified,224280199168,USD,NYQ,United States,2026-04-14
+WFC,Wells Fargo & Company,Financial Services,Banks - Diversified,252898689024,USD,NYQ,United States,2026-04-14
+SCHW,The Charles Schwab Corporation,Financial Services,Capital Markets,171348656128,USD,NYQ,United States,2026-04-14
+CME,CME Group Inc.,Financial Services,Financial Data & Stock Exchanges,107732238336,USD,NMS,United States,2026-04-14
+ICE,"Intercontinental Exchange, Inc.",Financial Services,Financial Data & Stock Exchanges,92516024320,USD,NYQ,United States,2026-04-14
