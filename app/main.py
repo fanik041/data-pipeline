@@ -64,8 +64,9 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_methods=["GET"],
+    allow_methods=["*"],   # must include POST for /auth/login
     allow_headers=["*"],
+    allow_credentials=True,
 )
 
 Backend = Literal["azure", "snowflake"]
