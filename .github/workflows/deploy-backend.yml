@@ -49,11 +49,26 @@ jobs:
         with:
           context: .
           push: true
-          platforms: linux/amd64
-          provenance: false   # prevents OCI index manifests that confuse AKS containerd
+          platforms: linux/arm64   # AKS node is arm64 (Standard_D2ps_v6 Ampere)
+          provenance: false
           tags: |
             ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
             ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:latest
+
+      # GATE: verify the pushed image is linux/amd64 before deploying to AKS
+      # If this fails, exec format error would have occurred on the node — fail fast here instead
+      - name: Verify image architecture is amd64
+        run: |
+          ARCH=$(docker buildx imagetools inspect ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            --format '{{range .Manifest.Manifests}}{{.Platform.OS}}/{{.Platform.Architecture}}{{"\n"}}{{end}}' 2>/dev/null \
+            || docker manifest inspect ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            | python3 -c "import sys,json; m=json.load(sys.stdin); print(m.get('architecture','unknown'))")
+          echo "Detected architecture: $ARCH"
+          if echo "$ARCH" | grep -qv "arm64"; then
+            echo "ERROR: image is not arm64 — will cause exec format error on AKS (arm64 node). Aborting deploy."
+            exit 1
+          fi
+          echo "PASS: image is amd64 — safe to deploy"
 
       # Write kubeconfig from secret so kubectl can talk to AKS
       - name: Set up kubectl

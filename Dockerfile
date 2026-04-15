@@ -5,7 +5,7 @@
 # Why multi-stage isn't used: single service, no compiled assets needed.
 # =============================================================================
 
-FROM --platform=linux/amd64 python:3.11-slim
+FROM --platform=linux/arm64 python:3.11-slim
 
 # System deps: pymssql needs FreeTDS headers at build time
 RUN apt-get update && apt-get install -y --no-install-recommends \
